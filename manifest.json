@@ -1,0 +1,21 @@
+{
+  "name": "프로 홈트 매니저 v2.0",
+  "short_name": "홈트매니저",
+  "description": "데이터 분석 기반의 스마트한 홈트레이닝 파트너",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

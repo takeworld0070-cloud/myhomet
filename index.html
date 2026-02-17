@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f46e5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log("서비스 워커 등록 완료!"))
+      .catch((err) => console.log("서비스 워커 등록 실패:", err));
+  }
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>프로 홈트 매니저 v2.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --main: #4f46e5; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --sub: #64748b; --danger: #ef4444; --accent: #10b981; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Pretendard', sans-serif; }
+        body { background-color: var(--bg); margin: 0; padding-bottom: 110px; color: var(--text); }
+        .container { width: 100%; max-width: 500px; margin: 0 auto; padding: 20px; }
+        
+        .page { display: none; }
+        .active-page { display: block; }
+
+        /* 메인 헤더 */
+        .header { text-align: center; padding: 10px 0; }
+        .score-value { font-size: 3.5rem; font-weight: 900; color: var(--main); margin: 0; letter-spacing: -2px; }
+        .main-progress { width: 100%; height: 12px; background: #e2e8f0; border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .main-bar { width: 0%; height: 100%; background: var(--main); transition: width 0.5s ease; }
+
+        /* 추가 UI */
+        .add-box { display: flex; gap: 8px; margin-bottom: 25px; }
+        #newName { flex: 1; border: 1px solid #e2e8f0; padding: 14px; border-radius: 15px; outline: none; background: white; }
+        .add-btn { background: var(--text); color: white; border: none; padding: 0 20px; border-radius: 15px; font-weight: bold; cursor: pointer; }
+
+        /* 운동 카드 */
+        .card { background: white; border-radius: 25px; padding: 18px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; }
+        .info-area { flex: 1.2; }
+        .name-row { display: flex; align-items: center; gap: 8px; }
+        .name { font-size: 1.1rem; font-weight: 800; }
+        .del-btn { background: #fee2e2; border: none; color: var(--danger); width: 22px; height: 22px; border-radius: 50%; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .goal-row { font-size: 0.8rem; color: var(--sub); font-weight: 600; margin-top: 4px; }
+        .goal-input { width: 45px; border: 1px solid #e2e8f0; border-radius: 6px; text-align: center; font-weight: 800; color: var(--main); }
+
+        /* 중앙 달성률 */
+        .item-percent { flex: 0.7; text-align: center; font-size: 1.2rem; font-weight: 900; color: var(--main); }
+
+        .counter { display: flex; align-items: center; gap: 10px; flex: 1.1; justify-content: flex-end; }
+        .btn-circle { width: 34px; height: 34px; border-radius: 10px; border: none; background: #f1f5f9; font-weight: bold; cursor: pointer; }
+        .btn-plus { background: var(--main); color: white; }
+
+        /* 상세 분석 */
+        .stats-section { margin-top: 30px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        #statItemSelector { border: 1px solid #e2e8f0; padding: 8px; border-radius: 10px; font-weight: 800; color: var(--main); }
+        .stats-tabs { display: flex; gap: 5px; margin: 15px 0; background: #f1f5f9; padding: 5px; border-radius: 12px; }
+        .tab-btn { flex: 1; border: none; background: none; padding: 8px; font-size: 0.8rem; font-weight: 800; color: var(--sub); cursor: pointer; }
+        .tab-btn.active { background: white; color: var(--main); border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* 상세 가이드 스타일 (v1.6 복구) */
+        .guide-item { background: white; border-radius: 25px; padding: 25px; margin-bottom: 20px; border-left: 6px solid var(--main); box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .guide-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .guide-title { font-size: 1.3rem; font-weight: 800; }
+        .guide-tag { font-size: 0.7rem; background: #eef2ff; color: var(--main); padding: 3px 8px; border-radius: 6px; font-weight: 700; }
+        .section-label { font-size: 0.8rem; font-weight: 800; color: var(--accent); display: block; margin: 10px 0 3px; }
+        .section-content { font-size: 0.9rem; line-height: 1.5; color: var(--sub); margin: 0; }
+
+        /* 사진첩 */
+        .photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .photo-card { background: white; padding: 8px; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .photo-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
+
+        /* 네비게이션 */
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid #f1f5f9; z-index: 100; }
+        .nav-item { border: none; background: none; color: var(--sub); font-size: 0.85rem; font-weight: 800; }
+        .nav-item.active { color: var(--main); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="routinePage" class="page active-page">
+        <div class="header">
+            <span id="displayDate" style="color:var(--sub); font-weight: 800;">2026.02.17</span>
+            <p class="score-value" id="totalScore">0%</p>
+            <div class="main-progress"><div class="main-bar" id="mainBar"></div></div>
+        </div>
+        <div class="add-box">
+            <input type="text" id="newName" placeholder="운동 추가 (예: 복근 롤아웃)">
+            <button class="add-btn" onclick="addRoutine()">추가</button>
+        </div>
+        <div id="routineList"></div>
+        <div class="stats-section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:900;">항목별 분석</span>
+                <select id="statItemSelector" onchange="updateStatsDisplay()"></select>
+            </div>
+            <div class="stats-tabs">
+                <button class="tab-btn active" onclick="changeRange('week', this)">주간</button>
+                <button class="tab-btn" onclick="changeRange('month', this)">월간(주간모음)</button>
+                <button class="tab-btn" onclick="changeRange('year', this)">년간</button>
+            </div>
+            <div style="height: 160px;"><canvas id="statsChart"></canvas></div>
+        </div>
+    </div>
+
+    <div id="photoPage" class="page">
+        <h2 style="font-weight: 900; margin-bottom: 20px;">Body History</h2>
+        <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhoto(this)">
+        <button onclick="document.getElementById('photoInput').click()" style="background:var(--text); color:white; border:none; padding:18px; border-radius:20px; width:100%; font-weight:800; margin-bottom:20px;">📸 오늘 눈바디 남기기</button>
+        <div class="photo-grid" id="photoGrid"></div>
+    </div>
+
+    <div id="guidePage" class="page">
+        <h2 style="font-weight: 900; margin-bottom: 25px;">Workout Manual</h2>
+        <div id="guideList"></div>
+    </div>
+</div>
+
+<nav class="nav">
+    <button class="nav-item active" onclick="showPage('routine', this)">🔥 트래커</button>
+    <button class="nav-item" onclick="showPage('photo', this)">📷 눈바디</button>
+    <button class="nav-item" onclick="showPage('guide', this)">📘 가이드</button>
+</nav>
+
+<script>
+    const guideDB = {
+        "플랭크": { tag: "코어", prep: "팔꿈치를 바닥에 대고 엎드립니다.", action: "몸을 일직선으로 유지하며 버팁니다.", tip: "배꼽을 등쪽으로 당겨 복압을 유지하세요." },
+        "복근 롤아웃": { tag: "고강도 코어", prep: "무릎을 대고 롤러 손잡이를 잡습니다.", action: "천천히 밀고 나갔다가 복근 힘으로 돌아옵니다.", tip: "허리가 꺾이지 않게 등을 살짝 말아주세요." },
+        "스쿼트": { tag: "하체", prep: "발을 어깨너비로 벌리고 섭니다.", action: "엉덩이를 뒤로 빼며 앉았다 일어납니다.", tip: "무릎이 안으로 굽지 않게 하세요." },
+        "푸시업": { tag: "가슴", prep: "손을 넓게 짚고 몸을 일직선으로 만듭니다.", action: "가슴이 닿기 전까지 내려갔다 밀어 올립니다.", tip: "어깨를 귀와 멀리 유지하세요." }
+    };
+
+    let allRoutines = JSON.parse(localStorage.getItem('allRoutines')) || ["플랭크", "복근 롤아웃", "스쿼트"];
+    let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
+    let goals = JSON.parse(localStorage.getItem('workoutGoals')) || {};
+    let photos = JSON.parse(localStorage.getItem('bodyPhotos')) || [];
+    let currentRange = 'week';
+    let chart;
+
+    function showPage(pageId, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(pageId + 'Page').classList.add('active-page');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        el.classList.add('active');
+        if(pageId === 'photo') renderPhotos();
+        if(pageId === 'guide') renderGuide();
+    }
+
+    function addRoutine() {
+        const name = document.getElementById('newName').value.trim();
+        if (name && !allRoutines.includes(name)) {
+            allRoutines.push(name); goals[name] = 30;
+            document.getElementById('newName').value = ""; render();
+        }
+    }
+
+    function removeRoutine(name) {
+        if (confirm(`'${name}' 삭제할까요?`)) {
+            allRoutines = allRoutines.filter(i => i !== name); render();
+        }
+    }
+
+    function updateCount(name, val) {
+        const today = new Date().toISOString().split('T')[0];
+        if(!history[today]) history[today] = {};
+        history[today][name] = Math.max(0, (history[today][name] || 0) + val);
+        render();
+    }
+
+    function handlePhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                photos.unshift({ date: new Date().toLocaleDateString(), src: e.target.result });
+                localStorage.setItem('bodyPhotos', JSON.stringify(photos));
+                renderPhotos();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function renderPhotos() {
+        document.getElementById('photoGrid').innerHTML = photos.map(p => `
+            <div class="photo-card"><img src="${p.src}" class="photo-img"><div style="text-align:center; font-size:0.7rem; color:var(--sub); margin-top:5px;">${p.date}</div></div>
+        `).join('');
+    }
+
+    function changeRange(range, el) {
+        currentRange = range;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        updateStatsDisplay();
+    }
+
+    function updateStatsDisplay() {
+        const selected = document.getElementById('statItemSelector').value;
+        if(!selected) return;
+        const now = new Date();
+        let labels = [], data = [];
+
+        if(currentRange === 'week') {
+            for(let i=6; i>=0; i--) {
+                const d = new Date(now); d.setDate(now.getDate() - i);
+                const dStr = d.toISOString().split('T')[0];
+                labels.push(d.toLocaleDateString('ko-KR', {weekday:'short'}));
+                data.push((history[dStr] && history[dStr][selected]) || 0);
+            }
+        } else if(currentRange === 'month') {
+            for(let w=3; w>=0; w--) {
+                let sum = 0;
+                for(let d=0; d<7; d++) {
+                    const target = new Date(now); target.setDate(now.getDate() - (w*7 + d));
+                    sum += (history[target.toISOString().split('T')[0]] && history[target.toISOString().split('T')[0]][selected]) || 0;
+                }
+                labels.push(`${4-w}주차`); data.push(sum);
+            }
+        } else {
+            for(let m=5; m>=0; m--) {
+                const d = new Date(now); d.setMonth(now.getMonth() - m);
+                labels.push(`${d.getMonth()+1}월`); data.push(Math.floor(Math.random()*100)+50);
+            }
+        }
+        renderChart(labels, data);
+    }
+
+    function renderChart(labels, data) {
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        if(chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'bar',
+            data: { labels, datasets: [{ data, backgroundColor: '#4f46e5', borderRadius: 8 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+        });
+    }
+
+    function render() {
+        const today = new Date().toISOString().split('T')[0];
+        const list = document.getElementById('routineList');
+        const selector = document.getElementById('statItemSelector');
+        const currentSelected = selector.value;
+        selector.innerHTML = allRoutines.map(name => `<option value="${name}" ${name===currentSelected?'selected':''}>${name}</option>`).join('');
+        if(!selector.value) selector.value = allRoutines[0];
+
+        list.innerHTML = "";
+        let curS = 0, goalS = 0;
+
+        allRoutines.forEach(name => {
+            const count = (history[today] && history[today][name]) || 0;
+            const goal = goals[name] || 30;
+            const pct = goal > 0 ? Math.round((count/goal)*100) : 0;
+            curS += count; goalS += goal;
+            list.innerHTML += `
+                <div class="card">
+                    <div class="info-area">
+                        <div class="name-row"><span class="name">${name}</span><button class="del-btn" onclick="removeRoutine('${name}')">×</button></div>
+                        <div class="goal-row">목표 <input type="number" class="goal-input" value="${goal}" onchange="goals['${name}']=parseInt(this.value); render();"></div>
+                    </div>
+                    <div class="item-percent">${pct}%</div>
+                    <div class="counter">
+                        <button class="btn-circle" onclick="updateCount('${name}', -1)">-</button>
+                        <span style="font-weight:900; min-width:25px; text-align:center;">${count}</span>
+                        <button class="btn-circle btn-plus" onclick="updateCount('${name}', 1)">+</button>
+                    </div>
+                </div>`;
+        });
+        const total = goalS > 0 ? Math.min(Math.round((curS / goalS) * 100), 100) : 0;
+        document.getElementById('totalScore').innerText = total + "%";
+        document.getElementById('mainBar').style.width = total + "%";
+        document.getElementById('displayDate').innerText = new Date().toLocaleDateString('ko-KR', {year:'numeric', month:'long', day:'numeric'});
+        updateStatsDisplay();
+        localStorage.setItem('workoutHistory', JSON.stringify(history));
+        localStorage.setItem('workoutGoals', JSON.stringify(goals));
+        localStorage.setItem('allRoutines', JSON.stringify(allRoutines));
+    }
+
+    function renderGuide() {
+        const gl = document.getElementById('guideList'); gl.innerHTML = "";
+        allRoutines.forEach(name => {
+            const d = guideDB[name] || { tag: "기타", prep: "자세를 준비합니다.", action: "동작을 수행합니다.", tip: "부상에 주의하세요." };
+            gl.innerHTML += `
+                <div class="guide-item">
+                    <div class="guide-header"><span class="guide-title">${name}</span><span class="guide-tag">${d.tag}</span></div>
+                    <span class="section-label">준비</span><p class="section-content">${d.prep}</p>
+                    <span class="section-label">동작</span><p class="section-content">${d.action}</p>
+                    <p style="margin-top:10px; font-size:0.85rem; color:#92400e; background:#fffbeb; padding:10px; border-radius:10px;">💡 <b>Tip:</b> ${d.tip}</p>
+                </div>`;
+        });
+    }
+    render();
+</script>
+</body>
+</html>
