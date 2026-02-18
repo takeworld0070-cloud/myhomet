@@ -3,72 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAKEWORLD S2 REAL</title>
+    <title>TAKEWORLD S2 PRO</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Pretendard:wght@400;700;900&display=swap');
-        :root { --bg: #0a0c10; --card: #161b22; --primary: #5865f2; --accent: #00d4ff; --text: #f0f6fc; --sub: #8b949e; }
+        :root { --bg: #0a0c10; --card: #161b22; --primary: #5865f2; --accent: #00d4ff; --text: #f0f6fc; --sub: #8b949e; --danger: #ef4444; }
+        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg); margin: 0; color: var(--text); font-family: 'Pretendard', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
-        .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 20px; }
+        .container { width: 100%; max-width: 480px; margin: 0 auto; padding: 20px; }
         
-        /* 타이틀 */
-        .main-title { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 900; background: linear-gradient(45deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0 20px 0; }
-        
-        /* 대시보드 */
-        .dashboard { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-        .score-val { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--accent); }
-        .bar-bg { width: 100%; height: 6px; background: #30363d; border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--primary); transition: width 0.5s ease; }
+        /* [상단 헤더] 날짜/시간 추가 */
+        .header-info { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+        .current-time { font-size: 0.8rem; color: var(--accent); font-weight: 700; font-family: 'Montserrat'; }
+        .main-title { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(45deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
 
-        /* 운동 리스트 */
-        .item-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
+        /* [대시보드] */
+        .dashboard { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; }
+        .score-label { font-size: 0.75rem; font-weight: 800; color: var(--sub); letter-spacing: 1px; }
+        .score-val { font-family: 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; color: var(--text); margin: 5px 0; }
+        .bar-bg { width: 100%; height: 8px; background: #30363d; border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.6s ease; }
+
+        /* [운동 리스트] */
+        .item-card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
         .item-info { flex: 1; }
-        .item-name { font-size: 1rem; font-weight: 800; display: block; }
-        .item-goal { font-size: 0.75rem; color: var(--sub); }
-        .item-ctrl { display: flex; align-items: center; gap: 10px; }
-        .btn-sq { width: 32px; height: 32px; border: none; border-radius: 8px; background: #30363d; color: white; font-weight: 800; }
-        .val { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 800; min-width: 25px; text-align: center; }
+        .item-name { font-size: 1.1rem; font-weight: 800; display: block; margin-bottom: 4px; }
+        .item-goal { font-size: 0.8rem; color: var(--sub); }
+        .item-ctrl { display: flex; align-items: center; gap: 15px; }
+        .btn-sq { width: 38px; height: 38px; border: none; border-radius: 12px; background: #30363d; color: white; font-weight: 900; font-size: 1.2rem; }
+        .btn-plus { background: var(--primary); box-shadow: 0 4px 15px rgba(88,101,242,0.3); }
+        .val { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 900; min-width: 30px; text-align: center; }
 
-        /* 그래프 섹션 (한눈에 들어오게!) */
-        .stats-card { background: var(--card); padding: 15px; border-radius: 20px; margin-top: 20px; }
-        .chart-container { position: relative; width: 100%; height: 180px; } /* 높이 고정으로 가독성 확보 */
-        .tabs { display: flex; gap: 4px; background: #000; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
-        .tab { flex: 1; border: none; background: none; color: var(--sub); padding: 8px; font-weight: 800; font-size: 0.75rem; border-radius: 7px; cursor: pointer; }
+        /* [S1 스타일 데이터 섹션] */
+        .stats-section { background: var(--card); padding: 20px; border-radius: 24px; margin-top: 30px; }
+        .tabs { display: flex; gap: 5px; background: #000; padding: 5px; border-radius: 14px; margin: 15px 0; }
+        .tab { flex: 1; border: none; background: none; color: var(--sub); padding: 10px; font-weight: 800; border-radius: 10px; font-size: 0.8rem; }
         .tab.active { background: var(--card); color: white; }
+        .chart-box { height: 200px; width: 100%; }
 
-        /* 사진 삭제 버튼 포함 그리드 */
-        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .photo-item { position: relative; border-radius: 12px; overflow: hidden; }
-        .btn-x { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; font-weight: 900; }
+        /* [바디 프로필] */
+        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .photo-item { position: relative; border-radius: 18px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .btn-del { position: absolute; top: 8px; right: 8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: 900; }
 
-        /* 하단 네비 */
-        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 12, 16, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .nav-item { border: none; background: none; color: var(--sub); font-weight: 800; font-size: 0.8rem; }
+        /* [네비게이션] */
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 12, 16, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { border: none; background: none; color: var(--sub); font-weight: 800; font-size: 0.85rem; }
         .nav-item.active { color: var(--primary); }
 
-        .footer { text-align: center; padding: 20px 0 100px; opacity: 0.4; font-size: 0.7rem; }
+        .footer { text-align: center; padding: 20px 0 100px; opacity: 0.4; font-size: 0.7rem; line-height: 1.6; }
+        .version { display: block; font-size: 0.6rem; margin-top: 5px; color: var(--sub); }
+        
         .page { display: none; }
-        .active-page { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .active-page { display: block; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="homePage" class="page active-page">
+        <div class="header-info">
+            <div id="liveTime" class="current-time">00:00:00</div>
+            <div id="liveDate" style="font-size: 0.7rem; color:var(--sub);">2026.02.18</div>
+        </div>
         <div class="main-title">HOME<br>TRAINING</div>
+        
         <div class="dashboard">
-            <span style="font-size:0.75rem; font-weight:800; color:var(--sub);">TOTAL PROGRESS</span>
+            <span class="score-label">TODAY'S PROGRESS</span>
             <div class="score-val" id="totalScore">0%</div>
             <div class="bar-bg"><div id="mainBar" class="bar-fill" style="width: 0%"></div></div>
         </div>
 
         <div id="routineList"></div>
 
-        <div class="stats-card">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <span style="font-weight:900; font-size:0.9rem;">ANALYTICS</span>
+        <div class="stats-section">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:900; font-size:0.9rem;">DATA ANALYTICS</span>
                 <select id="statType" onchange="drawChart()" style="background:none; border:none; color:var(--primary); font-weight:900; font-size:0.8rem;"></select>
             </div>
             <div class="tabs">
@@ -76,20 +88,21 @@
                 <button class="tab" onclick="changeRange('month', this)">MONTH</button>
                 <button class="tab" onclick="changeRange('year', this)">YEAR</button>
             </div>
-            <div class="chart-container"><canvas id="myChart"></canvas></div>
+            <div class="chart-box"><canvas id="myChart"></canvas></div>
         </div>
     </div>
 
     <div id="photoPage" class="page">
-        <div class="main-title">EVOLUTION</div>
+        <div class="main-title" style="margin-top:20px;">BODY<br>EVOLUTION</div>
         <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="addPhoto(this)">
-        <button onclick="document.getElementById('photoIn').click()" style="width:100%; padding:18px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:900; margin-bottom:20px;">📷 ADD PHOTO</button>
+        <button onclick="document.getElementById('photoIn').click()" style="width:100%; padding:20px; background:var(--primary); border:none; border-radius:20px; color:white; font-weight:900; margin-bottom:25px; box-shadow: 0 10px 20px rgba(88,101,242,0.2);">📷 ADD NEW SHOT</button>
         <div id="photoGrid" class="photo-grid"></div>
     </div>
 
     <footer class="footer">
         <p>Managed by <strong>TAKEWORLD</strong></p>
         <a href="mailto:takeworld0070@gmail.com" style="color:var(--sub); text-decoration:none;">takeworld0070@gmail.com</a>
+        <span class="version">v2.2.0 PRO ULTRA</span>
     </footer>
 </div>
 
@@ -99,12 +112,21 @@
 </nav>
 
 <script>
-    // S1 데이터 키값 그대로 복구
+    // [데이터 보존] S1과 동일한 키값 사용
     let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
     let photos = JSON.parse(localStorage.getItem('bodyPhotos')) || [];
     let curRange = 'week', chart;
     const routines = ["플랭크", "스쿼트", "복근 롤아웃", "푸쉬업"];
     const goals = { "플랭크": 60, "스쿼트": 100, "복근 롤아웃": 30, "푸쉬업": 50 };
+
+    // [실시간 시간 업데이트]
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+        document.getElementById('liveDate').innerText = now.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
     function go(p, el) {
         document.querySelectorAll('.page').forEach(x => x.classList.remove('active-page'));
@@ -125,11 +147,11 @@
             const count = (history[today] && history[today][name]) || 0;
             curS += Math.min(count, goals[name]); goalS += goals[name];
             list.innerHTML += `<div class="item-card">
-                <div class="item-info"><span class="item-name">${name}</span><span class="item-goal">Goal: ${goals[name]}</span></div>
+                <div class="item-info"><span class="item-name">${name}</span><span class="item-goal">목표: ${goals[name]}</span></div>
                 <div class="item-ctrl">
                     <button class="btn-sq" onclick="upd('${name}',-1)">-</button>
                     <span class="val">${count}</span>
-                    <button class="btn-sq" style="background:var(--primary)" onclick="upd('${name}',1)">+</button>
+                    <button class="btn-sq btn-plus" onclick="upd('${name}',1)">+</button>
                 </div>
             </div>`;
         });
@@ -192,8 +214,8 @@
         if(chart) chart.destroy();
         chart = new Chart(ctx, {
             type: 'bar',
-            data: { labels, datasets: [{ data, backgroundColor: '#5865f2', borderRadius: 5 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 10 } } } } }
+            data: { labels, datasets: [{ data, backgroundColor: '#5865f2', borderRadius: 6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 11 } } } } }
         });
     }
 
@@ -210,7 +232,7 @@
     function renderPhotos() {
         document.getElementById('photoGrid').innerHTML = photos.map(p => `
             <div class="photo-item"><img src="${p.src}" style="width:100%; aspect-ratio:1; object-fit:cover;">
-            <button onclick="delPhoto(${p.id})" class="btn-x">×</button></div>
+            <button onclick="delPhoto(${p.id})" class="btn-del">×</button></div>
         `).join('');
     }
     function delPhoto(id) { if(confirm("삭제하시겠습니까?")) { photos = photos.filter(p => p.id !== id); localStorage.setItem('bodyPhotos', JSON.stringify(photos)); renderPhotos(); } }
