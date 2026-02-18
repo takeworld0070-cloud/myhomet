@@ -3,41 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAKEWORLD S2 ULTRA</title>
+    <title>TAKEWORLD S2 REAL</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Pretendard:wght@400;700;900&display=swap');
-        :root { --bg: #0a0c10; --card: #161b22; --primary: #5865f2; --accent: #00d4ff; --text: #f0f6fc; --sub: #8b949e; --danger: #ef4444; }
+        :root { --bg: #0a0c10; --card: #161b22; --primary: #5865f2; --accent: #00d4ff; --text: #f0f6fc; --sub: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); margin: 0; color: var(--text); font-family: 'Pretendard', sans-serif; padding-bottom: 120px; }
-        .container { width: 100%; max-width: 480px; margin: 0 auto; padding: 20px; }
+        body { background-color: var(--bg); margin: 0; color: var(--text); font-family: 'Pretendard', sans-serif; overflow-x: hidden; padding-bottom: 100px; }
+        .container { width: 100%; max-width: 450px; margin: 0 auto; padding: 20px; }
         
-        .main-title { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(45deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
-        .dashboard { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
-        .score-val { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 900; color: var(--accent); }
+        /* 타이틀 */
+        .main-title { font-family: 'Montserrat', sans-serif; font-size: 2rem; font-weight: 900; background: linear-gradient(45deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0 20px 0; }
+        
+        /* 대시보드 */
+        .dashboard { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+        .score-val { font-family: 'Montserrat', sans-serif; font-size: 2.5rem; font-weight: 900; color: var(--accent); }
+        .bar-bg { width: 100%; height: 6px; background: #30363d; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--primary); transition: width 0.5s ease; }
 
         /* 운동 리스트 */
-        .item-card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
+        .item-card { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
         .item-info { flex: 1; }
-        .item-name { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .item-name { font-size: 1rem; font-weight: 800; display: block; }
+        .item-goal { font-size: 0.75rem; color: var(--sub); }
         .item-ctrl { display: flex; align-items: center; gap: 10px; }
-        .btn-sq { width: 36px; height: 36px; border: none; border-radius: 10px; background: #30363d; color: white; font-weight: 800; }
-        .btn-plus { background: var(--primary); }
+        .btn-sq { width: 32px; height: 32px; border: none; border-radius: 8px; background: #30363d; color: white; font-weight: 800; }
+        .val { font-family: 'Montserrat', sans-serif; font-size: 1.1rem; font-weight: 800; min-width: 25px; text-align: center; }
 
-        /* 통계 탭 */
-        .tabs { display: flex; gap: 5px; background: #000; padding: 5px; border-radius: 12px; margin: 15px 0; }
-        .tab { flex: 1; border: none; background: none; color: var(--sub); padding: 10px; font-weight: 800; border-radius: 8px; font-size: 0.8rem; }
+        /* 그래프 섹션 (한눈에 들어오게!) */
+        .stats-card { background: var(--card); padding: 15px; border-radius: 20px; margin-top: 20px; }
+        .chart-container { position: relative; width: 100%; height: 180px; } /* 높이 고정으로 가독성 확보 */
+        .tabs { display: flex; gap: 4px; background: #000; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
+        .tab { flex: 1; border: none; background: none; color: var(--sub); padding: 8px; font-weight: 800; font-size: 0.75rem; border-radius: 7px; cursor: pointer; }
         .tab.active { background: var(--card); color: white; }
 
-        /* 타이머 모달 */
-        #timerBox { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 250px; background: var(--card); padding: 30px; border-radius: 30px; border: 1px solid var(--primary); display: none; text-align: center; z-index: 2000; box-shadow: 0 0 50px rgba(88,101,242,0.3); }
-        .timer-val { font-family: 'Montserrat', sans-serif; font-size: 3rem; font-weight: 900; color: var(--accent); }
+        /* 사진 삭제 버튼 포함 그리드 */
+        .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .photo-item { position: relative; border-radius: 12px; overflow: hidden; }
+        .btn-x { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; font-weight: 900; }
 
-        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 12, 16, 0.95); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
-        .nav-item { border: none; background: none; color: var(--sub); font-weight: 800; }
+        /* 하단 네비 */
+        .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 12, 16, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 30px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .nav-item { border: none; background: none; color: var(--sub); font-weight: 800; font-size: 0.8rem; }
         .nav-item.active { color: var(--primary); }
 
-        .footer { text-align: center; padding: 20px 0 100px; opacity: 0.5; font-size: 0.7rem; }
+        .footer { text-align: center; padding: 20px 0 100px; opacity: 0.4; font-size: 0.7rem; }
         .page { display: none; }
         .active-page { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -47,72 +57,56 @@
 
 <div class="container">
     <div id="homePage" class="page active-page">
-        <div class="main-title">ULTRA<br>TRAINING</div>
+        <div class="main-title">HOME<br>TRAINING</div>
         <div class="dashboard">
-            <span style="font-size:0.8rem; font-weight:800; color:var(--sub);">COMPLETION RATE</span>
+            <span style="font-size:0.75rem; font-weight:800; color:var(--sub);">TOTAL PROGRESS</span>
             <div class="score-val" id="totalScore">0%</div>
-            <div style="width:100%; height:8px; background:#30363d; border-radius:10px; margin-top:10px;">
-                <div id="mainBar" style="width:0%; height:100%; background:linear-gradient(90deg, var(--primary), var(--accent)); border-radius:10px;"></div>
-            </div>
+            <div class="bar-bg"><div id="mainBar" class="bar-fill" style="width: 0%"></div></div>
         </div>
-
-        <button onclick="openTimer()" style="width:100%; padding:15px; background:rgba(0,212,255,0.1); color:var(--accent); border:1px dashed var(--accent); border-radius:15px; font-weight:900; margin-bottom:20px;">⏱ OPEN FOCUS TIMER</button>
 
         <div id="routineList"></div>
 
-        <div style="margin-top:40px; background:var(--card); padding:20px; border-radius:24px;">
-            <div style="display:flex; justify-content:space-between;">
-                <span style="font-weight:900;">STATS</span>
-                <select id="statType" onchange="renderChart()" style="background:none; border:none; color:var(--primary); font-weight:900;"></select>
+        <div class="stats-card">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <span style="font-weight:900; font-size:0.9rem;">ANALYTICS</span>
+                <select id="statType" onchange="drawChart()" style="background:none; border:none; color:var(--primary); font-weight:900; font-size:0.8rem;"></select>
             </div>
             <div class="tabs">
                 <button class="tab active" onclick="changeRange('week', this)">WEEK</button>
                 <button class="tab" onclick="changeRange('month', this)">MONTH</button>
                 <button class="tab" onclick="changeRange('year', this)">YEAR</button>
             </div>
-            <canvas id="myChart" style="height:180px;"></canvas>
+            <div class="chart-container"><canvas id="myChart"></canvas></div>
         </div>
     </div>
 
     <div id="photoPage" class="page">
-        <div class="main-title">BODY<br>PROGRESS</div>
-        <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="processPhoto(this)">
-        <button onclick="document.getElementById('photoIn').click()" style="width:100%; padding:20px; background:var(--primary); border:none; border-radius:18px; color:white; font-weight:900; margin-bottom:20px;">📷 ADD BODY SHOT</button>
-        <div id="photoGrid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
+        <div class="main-title">EVOLUTION</div>
+        <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="addPhoto(this)">
+        <button onclick="document.getElementById('photoIn').click()" style="width:100%; padding:18px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:900; margin-bottom:20px;">📷 ADD PHOTO</button>
+        <div id="photoGrid" class="photo-grid"></div>
     </div>
 
     <footer class="footer">
-        <div style="margin-bottom:10px;">
-            <button onclick="exportData()" style="background:none; border:1px solid var(--sub); color:var(--sub); padding:5px 10px; border-radius:5px; font-size:0.6rem;">데이터 백업</button>
-            <button onclick="importData()" style="background:none; border:1px solid var(--sub); color:var(--sub); padding:5px 10px; border-radius:5px; font-size:0.6rem;">데이터 복구</button>
-        </div>
         <p>Managed by <strong>TAKEWORLD</strong></p>
         <a href="mailto:takeworld0070@gmail.com" style="color:var(--sub); text-decoration:none;">takeworld0070@gmail.com</a>
     </footer>
 </div>
 
-<div id="timerBox">
-    <div class="timer-val" id="tVal">01:00</div>
-    <div style="margin:20px 0; display:flex; gap:10px; justify-content:center;">
-        <button onclick="startTimer()" style="background:var(--primary); color:white; border:none; padding:10px 15px; border-radius:10px;">START</button>
-        <button onclick="closeTimer()" style="background:#333; color:white; border:none; padding:10px 15px; border-radius:10px;">CLOSE</button>
-    </div>
-</div>
-
 <nav class="nav">
-    <button class="nav-item active" onclick="showPage('home', this)">TRACK</button>
-    <button class="nav-item" onclick="showPage('photo', this)">BODY</button>
+    <button class="nav-item active" onclick="go('home', this)">TRACK</button>
+    <button class="nav-item" onclick="go('photo', this)">BODY</button>
 </nav>
 
 <script>
-    // 기존 데이터 보존을 위한 키값 유지
+    // S1 데이터 키값 그대로 복구
     let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
     let photos = JSON.parse(localStorage.getItem('bodyPhotos')) || [];
     let curRange = 'week', chart;
     const routines = ["플랭크", "스쿼트", "복근 롤아웃", "푸쉬업"];
     const goals = { "플랭크": 60, "스쿼트": 100, "복근 롤아웃": 30, "푸쉬업": 50 };
 
-    function showPage(p, el) {
+    function go(p, el) {
         document.querySelectorAll('.page').forEach(x => x.classList.remove('active-page'));
         document.getElementById(p + 'Page').classList.add('active-page');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -131,11 +125,11 @@
             const count = (history[today] && history[today][name]) || 0;
             curS += Math.min(count, goals[name]); goalS += goals[name];
             list.innerHTML += `<div class="item-card">
-                <div class="item-info"><span class="item-name">${name}</span><span style="color:var(--sub); font-size:0.75rem;">Goal: ${goals[name]}</span></div>
+                <div class="item-info"><span class="item-name">${name}</span><span class="item-goal">Goal: ${goals[name]}</span></div>
                 <div class="item-ctrl">
                     <button class="btn-sq" onclick="upd('${name}',-1)">-</button>
-                    <span style="font-family:Montserrat; font-weight:900; font-size:1.2rem; min-width:30px; text-align:center;">${count}</span>
-                    <button class="btn-sq btn-plus" onclick="upd('${name}',1)">+</button>
+                    <span class="val">${count}</span>
+                    <button class="btn-sq" style="background:var(--primary)" onclick="upd('${name}',1)">+</button>
                 </div>
             </div>`;
         });
@@ -143,7 +137,7 @@
         document.getElementById('totalScore').innerText = p+"%";
         document.getElementById('mainBar').style.width = p+"%";
         localStorage.setItem('workoutHistory', JSON.stringify(history));
-        renderChart();
+        drawChart();
     }
 
     function upd(n, v) {
@@ -153,15 +147,14 @@
         render();
     }
 
-    // 통계 차트 로직 (주/월/년 완벽 지원)
     function changeRange(r, btn) {
         curRange = r;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
-        renderChart();
+        drawChart();
     }
 
-    function renderChart() {
+    function drawChart() {
         const sel = document.getElementById('statType').value;
         const ctx = document.getElementById('myChart').getContext('2d');
         let labels = [], data = [];
@@ -171,8 +164,7 @@
             for(let i=6; i>=0; i--) {
                 const d = new Date(now); d.setDate(now.getDate()-i);
                 labels.push(d.toLocaleDateString('ko-KR',{weekday:'short'}));
-                const ds = d.toISOString().split('T')[0];
-                data.push((history[ds] && history[ds][sel]) || 0);
+                data.push((history[d.toISOString().split('T')[0]] && history[d.toISOString().split('T')[0]][sel]) || 0);
             }
         } else if(curRange === 'month') {
             for(let i=3; i>=0; i--) {
@@ -180,8 +172,7 @@
                 let sum = 0;
                 for(let j=0; j<7; j++) {
                     const d = new Date(now); d.setDate(now.getDate()-(i*7+j));
-                    const ds = d.toISOString().split('T')[0];
-                    sum += (history[ds] && history[ds][sel]) || 0;
+                    sum += (history[d.toISOString().split('T')[0]] && history[d.toISOString().split('T')[0]][sel]) || 0;
                 }
                 data.push(sum);
             }
@@ -200,50 +191,13 @@
 
         if(chart) chart.destroy();
         chart = new Chart(ctx, {
-            type: 'line',
-            data: { labels, datasets: [{ label: sel, data, borderColor: '#5865f2', tension: 0.4, fill: true, backgroundColor: 'rgba(88,101,242,0.1)' }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            type: 'bar',
+            data: { labels, datasets: [{ data, backgroundColor: '#5865f2', borderRadius: 5 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { color: '#8b949e', font: { size: 10 } } } } }
         });
     }
 
-    // 타이머 기능
-    let tSec = 60, tInt;
-    function openTimer() { document.getElementById('timerBox').style.display = 'block'; }
-    function closeTimer() { clearInterval(tInt); document.getElementById('timerBox').style.display = 'none'; }
-    function startTimer() {
-        clearInterval(tInt); tSec = 60;
-        tInt = setInterval(() => {
-            tSec--;
-            const m = String(Math.floor(tSec/60)).padStart(2,'0');
-            const s = String(tSec%60).padStart(2,'0');
-            document.getElementById('tVal').innerText = `${m}:${s}`;
-            if(tSec <= 0) { clearInterval(tInt); alert("운동 완료!"); closeTimer(); }
-        }, 1000);
-    }
-
-    // 데이터 백업 기능
-    function exportData() {
-        const blob = new Blob([JSON.stringify({history, photos})], {type: 'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `TW_Backup_${new Date().toISOString().split('T')[0]}.json`; a.click();
-    }
-
-    function importData() {
-        const input = document.createElement('input'); input.type = 'file';
-        input.onchange = e => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const d = JSON.parse(reader.result);
-                history = d.history || {}; photos = d.photos || [];
-                localStorage.setItem('workoutHistory', JSON.stringify(history));
-                localStorage.setItem('bodyPhotos', JSON.stringify(photos));
-                render(); alert("데이터 복구 완료!");
-            };
-            reader.readAsText(e.target.files[0]);
-        };
-        input.click();
-    }
-
-    function processPhoto(i) {
+    function addPhoto(i) {
         if (i.files && i.files[0]) {
             const r = new FileReader();
             r.onload = e => {
@@ -255,11 +209,11 @@
     }
     function renderPhotos() {
         document.getElementById('photoGrid').innerHTML = photos.map(p => `
-            <div style="position:relative;"><img src="${p.src}" style="width:100%; aspect-ratio:1; object-fit:cover; border-radius:15px;">
-            <button onclick="delPhoto(${p.id})" style="position:absolute; top:5px; right:5px; background:red; color:white; border:none; border-radius:50%; width:20px; height:20px;">×</button></div>
+            <div class="photo-item"><img src="${p.src}" style="width:100%; aspect-ratio:1; object-fit:cover;">
+            <button onclick="delPhoto(${p.id})" class="btn-x">×</button></div>
         `).join('');
     }
-    function delPhoto(id) { if(confirm("삭제?")) { photos = photos.filter(p => p.id !== id); localStorage.setItem('bodyPhotos', JSON.stringify(photos)); renderPhotos(); } }
+    function delPhoto(id) { if(confirm("삭제하시겠습니까?")) { photos = photos.filter(p => p.id !== id); localStorage.setItem('bodyPhotos', JSON.stringify(photos)); renderPhotos(); } }
 
     render();
 </script>
