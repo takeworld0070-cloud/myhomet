@@ -8,58 +8,50 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Pretendard:wght@400;700;900&display=swap');
         :root { --bg: #0a0c10; --card: #161b22; --primary: #5865f2; --accent: #00d4ff; --text: #f0f6fc; --sub: #8b949e; --danger: #ef4444; }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg); margin: 0; color: var(--text); font-family: 'Pretendard', sans-serif; padding-bottom: 100px; }
         .container { width: 100%; max-width: 480px; margin: 0 auto; padding: 20px; }
         
-        /* 헤더 & 날짜 */
         .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .current-time { font-size: 0.85rem; color: var(--accent); font-weight: 800; font-family: 'Montserrat'; }
         .main-title { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 900; background: linear-gradient(45deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin: 0; }
 
-        /* 대시보드 */
-        .dashboard { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; position: relative; overflow: hidden; }
+        .dashboard { background: var(--card); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; }
         .score-val { font-family: 'Montserrat', sans-serif; font-size: 3.5rem; font-weight: 900; margin: 5px 0; }
         .bar-bg { width: 100%; height: 8px; background: #30363d; border-radius: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width 0.6s ease; }
 
-        /* 항목 추가 입력창 */
-        .add-box { display: flex; gap: 8px; margin-bottom: 20px; }
-        .add-input { flex: 1; background: var(--card); border: 1px solid #30363d; border-radius: 12px; padding: 12px; color: white; outline: none; }
-        .btn-add { background: var(--primary); border: none; border-radius: 12px; color: white; padding: 0 15px; font-weight: 900; }
+        /* [핵심] 항목 및 목표 추가 섹션 */
+        .add-box { background: var(--card); padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .add-inputs { display: flex; gap: 8px; margin-bottom: 10px; }
+        .add-input { flex: 2; background: #000; border: 1px solid #30363d; border-radius: 10px; padding: 12px; color: white; outline: none; font-size: 0.9rem; }
+        .goal-input { flex: 1; background: #000; border: 1px solid #30363d; border-radius: 10px; padding: 12px; color: var(--accent); outline: none; font-family: 'Montserrat'; font-weight: 700; }
+        .btn-add { width: 100%; background: var(--primary); border: none; border-radius: 10px; color: white; padding: 12px; font-weight: 900; cursor: pointer; }
 
-        /* 리스트 카드 */
         .item-card { background: var(--card); padding: 18px; border-radius: 20px; margin-bottom: 12px; display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.03); }
         .item-info { flex: 1; }
         .item-name { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+        .item-goal-text { font-size: 0.8rem; color: var(--sub); font-weight: 600; margin-top: 4px; }
         .btn-del-item { background: none; border: none; color: var(--danger); font-size: 0.7rem; padding: 0; cursor: pointer; opacity: 0.6; }
         .item-ctrl { display: flex; align-items: center; gap: 15px; }
         .btn-sq { width: 38px; height: 38px; border: none; border-radius: 12px; background: #30363d; color: white; font-weight: 900; font-size: 1.2rem; }
         .val { font-family: 'Montserrat', sans-serif; font-size: 1.3rem; font-weight: 900; min-width: 30px; text-align: center; }
 
-        /* 통계 & 탭 */
         .stats-section { background: var(--card); padding: 20px; border-radius: 24px; margin-top: 30px; }
         .tabs { display: flex; gap: 5px; background: #000; padding: 5px; border-radius: 14px; margin: 15px 0; }
         .tab { flex: 1; border: none; background: none; color: var(--sub); padding: 10px; font-weight: 800; border-radius: 10px; font-size: 0.75rem; }
         .tab.active { background: var(--bg); color: white; }
 
-        /* 가이드 디자인 */
         .guide-card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
-        .guide-tag { font-size: 0.7rem; color: var(--accent); font-weight: 900; text-transform: uppercase; }
-        .guide-body { margin-top: 10px; font-size: 0.9rem; line-height: 1.5; color: var(--text); }
-
-        /* 사진첩 */
         .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .photo-item { position: relative; border-radius: 18px; overflow: hidden; }
         .btn-del-img { position: absolute; top: 8px; right: 8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: 900; }
 
-        /* 네비게이션 */
         .nav { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10, 12, 16, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 15px 0 35px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
         .nav-item { border: none; background: none; color: var(--sub); font-weight: 800; font-size: 0.8rem; }
         .nav-item.active { color: var(--primary); }
-
         .footer { text-align: center; padding: 20px 0 100px; opacity: 0.4; font-size: 0.7rem; }
+        
         .page { display: none; }
         .active-page { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -73,24 +65,27 @@
             <div id="liveTime" class="current-time">00:00:00</div>
             <div id="liveDate" style="font-size: 0.75rem; font-weight: 700;">2026.02.18</div>
         </div>
-        <p class="main-title">PRO<br>TRACKER</p>
+        <p class="main-title">PRO<br>MAX TRACK</p>
         
         <div class="dashboard" style="margin-top:20px;">
-            <span style="font-size:0.75rem; color:var(--sub); font-weight:800;">DAILY PERFORMANCE</span>
+            <span style="font-size:0.75rem; color:var(--sub); font-weight:800;">TOTAL ACHIEVEMENT</span>
             <div class="score-val" id="totalScore">0%</div>
             <div class="bar-bg"><div id="mainBar" class="bar-fill" style="width: 0%"></div></div>
         </div>
 
         <div class="add-box">
-            <input type="text" id="newItemName" class="add-input" placeholder="새 운동 항목 입력...">
-            <button onclick="addItem()" class="btn-add">ADD</button>
+            <div class="add-inputs">
+                <input type="text" id="newName" class="add-input" placeholder="운동 이름 (예: 플랭크)">
+                <input type="number" id="newGoal" class="goal-input" placeholder="목표">
+            </div>
+            <button onclick="addItem()" class="btn-add">ADD NEW WORKOUT</button>
         </div>
 
         <div id="routineList"></div>
 
         <div class="stats-section">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-weight:900; font-size:0.9rem;">DATA ANALYTICS</span>
+                <span style="font-weight:900; font-size:0.9rem;">ANALYTICS</span>
                 <select id="statType" onchange="drawChart()" style="background:none; border:none; color:var(--primary); font-weight:900; font-size:0.8rem;"></select>
             </div>
             <div class="tabs">
@@ -103,21 +98,20 @@
     </div>
 
     <div id="guidePage" class="page">
-        <p class="main-title">EXERCISE<br>MANUAL</p>
+        <p class="main-title">MANUAL</p>
         <div id="guideList" style="margin-top:25px;"></div>
     </div>
 
     <div id="photoPage" class="page">
-        <p class="main-title">BODY<br>PROFILING</p>
+        <p class="main-title">BODY</p>
         <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="addPhoto(this)">
-        <button onclick="document.getElementById('photoIn').click()" style="width:100%; padding:18px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:900; margin:20px 0; box-shadow: 0 8px 15px rgba(88,101,242,0.2);">📷 UPLOAD PROGRESS</button>
+        <button onclick="document.getElementById('photoIn').click()" style="width:100%; padding:20px; background:var(--primary); border:none; border-radius:15px; color:white; font-weight:900; margin:20px 0;">📷 UPLOAD</button>
         <div id="photoGrid" class="photo-grid"></div>
     </div>
 
     <footer class="footer">
         <p>Managed by <strong>TAKEWORLD</strong></p>
-        <a href="mailto:takeworld0070@gmail.com" style="color:var(--sub); text-decoration:none;">takeworld0070@gmail.com</a>
-        <div style="margin-top:8px; font-size:0.6rem; letter-spacing:1px;">VERSION 2.3.5 PRO MAX</div>
+        <span style="font-size:0.6rem;">V 2.5.0 ULTIMATE</span>
     </footer>
 </div>
 
@@ -128,18 +122,13 @@
 </nav>
 
 <script>
-    // [데이터 시스템]
-    let routines = JSON.parse(localStorage.getItem('twRoutines')) || ["플랭크", "스쿼트", "복근 롤아웃", "푸쉬업"];
+    // [데이터 구조 복구 및 목표 데이터 통합]
+    let routines = JSON.parse(localStorage.getItem('twRoutines_v2')) || [
+        {name: "플랭크", goal: 60}, {name: "스쿼트", goal: 100}, {name: "복근 롤아웃", goal: 30}
+    ];
     let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
     let photos = JSON.parse(localStorage.getItem('bodyPhotos')) || [];
     let curRange = 'week', chart;
-
-    const guideDB = {
-        "플랭크": "팔꿈치를 어깨너비로 대고 몸을 일직선으로 유지하세요. 복부에 힘을 주고 엉덩이가 처지지 않게 주의합니다.",
-        "스쿼트": "발을 어깨너비로 벌리고 무릎이 발끝을 나가지 않게 앉습니다. 허리는 곧게 펴고 뒤꿈치에 힘을 줍니다.",
-        "복근 롤아웃": "무릎을 대고 휠을 천천히 앞으로 밀었다가 복근의 힘으로 당깁니다. 허리가 꺾이지 않는 지점까지만 가세요.",
-        "푸쉬업": "손바닥을 가슴 옆에 두고 가슴이 바닥에 닿을 듯 내려갔다 올라옵니다. 몸 전체가 막대기처럼 같이 움직여야 합니다."
-    };
 
     function updateClock() {
         const now = new Date();
@@ -161,40 +150,46 @@
         const today = new Date().toISOString().split('T')[0];
         const list = document.getElementById('routineList');
         const sel = document.getElementById('statType');
-        sel.innerHTML = routines.map(r => `<option>${r}</option>`).join('');
+        sel.innerHTML = routines.map(r => `<option>${r.name}</option>`).join('');
         
-        list.innerHTML = ""; let curS = 0;
-        routines.forEach(name => {
-            const count = (history[today] && history[today][name]) || 0;
-            curS += Math.min(count, 50); // 게이지용 임시 목표
+        list.innerHTML = ""; let curSum = 0, goalSum = 0;
+        routines.forEach(item => {
+            const count = (history[today] && history[today][item.name]) || 0;
+            curSum += Math.min(count, item.goal);
+            goalSum += item.goal;
             list.innerHTML += `<div class="item-card">
                 <div class="item-info">
-                    <span class="item-name">${name} <button class="btn-del-item" onclick="delItem('${name}')">삭제</button></span>
+                    <span class="item-name">${item.name} <button class="btn-del-item" onclick="delItem('${item.name}')">삭제</button></span>
+                    <div class="item-goal-text">Daily Goal: ${item.goal}</div>
                 </div>
                 <div class="item-ctrl">
-                    <button class="btn-sq" onclick="upd('${name}',-1)">-</button>
+                    <button class="btn-sq" onclick="upd('${item.name}',-1)">-</button>
                     <span class="val">${count}</span>
-                    <button class="btn-sq" style="background:var(--primary)" onclick="upd('${name}',1)">+</button>
+                    <button class="btn-sq" style="background:var(--primary)" onclick="upd('${item.name}',1)">+</button>
                 </div>
             </div>`;
         });
-        const p = Math.min(Math.round((curS/(routines.length*50))*100), 100);
-        document.getElementById('totalScore').innerText = p+"%";
-        document.getElementById('mainBar').style.width = p+"%";
+        const p = goalSum > 0 ? Math.round((curSum / goalSum) * 100) : 0;
+        document.getElementById('totalScore').innerText = p + "%";
+        document.getElementById('mainBar').style.width = p + "%";
         localStorage.setItem('workoutHistory', JSON.stringify(history));
-        localStorage.setItem('twRoutines', JSON.stringify(routines));
+        localStorage.setItem('twRoutines_v2', JSON.stringify(routines));
         drawChart();
     }
 
     function addItem() {
-        const val = document.getElementById('newItemName').value.trim();
-        if(val && !routines.includes(val)) {
-            routines.push(val);
-            document.getElementById('newItemName').value = "";
-            render();
-        }
+        const name = document.getElementById('newName').value.trim();
+        const goal = parseInt(document.getElementById('newGoal').value);
+        if(name && goal > 0) {
+            if(!routines.find(r => r.name === name)) {
+                routines.push({name, goal});
+                document.getElementById('newName').value = "";
+                document.getElementById('newGoal').value = "";
+                render();
+            } else { alert("이미 존재하는 항목입니다."); }
+        } else { alert("이름과 목표 수치를 정확히 입력하세요."); }
     }
-    function delItem(n) { if(confirm("항목을 삭제하시겠습니까?")) { routines = routines.filter(x => x !== n); render(); } }
+    function delItem(n) { if(confirm("항목을 삭제하시겠습니까?")) { routines = routines.filter(x => x.name !== n); render(); } }
     function upd(n, v) {
         const t = new Date().toISOString().split('T')[0];
         if(!history[t]) history[t] = {};
@@ -204,11 +199,12 @@
 
     function renderGuides() {
         const gl = document.getElementById('guideList');
-        gl.innerHTML = routines.map(name => `
+        gl.innerHTML = routines.map(r => `
             <div class="guide-card">
-                <div class="guide-tag">TECHNIQUE</div>
-                <div style="font-weight:900; font-size:1.2rem; margin-top:5px;">${name}</div>
-                <div class="guide-body">${guideDB[name] || "추가된 운동 항목입니다. 자신만의 가이드를 세워보세요!"}</div>
+                <div style="font-weight:900; font-size:1.2rem; color:var(--accent);">${r.name}</div>
+                <div style="margin-top:8px; font-size:0.9rem; color:var(--sub); line-height:1.4;">
+                    매일 ${r.goal}회(초)를 목표로 꾸준히 수행하세요. 정확한 자세가 속도보다 중요합니다.
+                </div>
             </div>
         `).join('');
     }
@@ -251,7 +247,6 @@
                 data.push(sum);
             }
         }
-
         if(chart) chart.destroy();
         chart = new Chart(ctx, {
             type: 'bar',
@@ -276,7 +271,7 @@
             <button onclick="delPhoto(${p.id})" class="btn-del-img">×</button></div>
         `).join('');
     }
-    function delPhoto(id) { if(confirm("사진 삭제?")) { photos = photos.filter(p => p.id !== id); localStorage.setItem('bodyPhotos', JSON.stringify(photos)); renderPhotos(); } }
+    function delPhoto(id) { if(confirm("삭제?")) { photos = photos.filter(p => p.id !== id); localStorage.setItem('bodyPhotos', JSON.stringify(photos)); renderPhotos(); } }
 
     render();
 </script>
